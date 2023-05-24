@@ -1,0 +1,53 @@
+livros
+	nome, ISBN, autor, editora, ano
+autor
+clientes
+	login
+	senha
+
+
+autenticar usuário
+cadastro de livros: ISBN, nome, autor, editora, ano
+cadastro de autores: nome, pais
+cadastro de clientes: matricula, nome, telefone
+retira de livros:
+	calcular disponibilidade: true
+	calcular limite de livros: true
+	calcular data para entrega: date
+
+devolução de livros:
+	calcular atraso:
+	
+buscadores:
+	nome
+	disponíveis
+	autor
+ 
+{
+    "cliente": [
+        {
+            "id": 0,
+            "matricula": "000", 
+            "nome": "nome", 
+            "telefone": "000-0000",
+            "login": "login",
+            "senha": "senha"
+        }
+    ],
+    "autor": [
+        {
+            "id": 0,
+            "nome": "nome",
+            "pais": "pais"
+        }
+    ],
+    "livro": [
+        {
+            "id": 0,
+            "nome": "nome",
+            "autor": 0,
+            "editora": "ediotora",
+            "ano": "2020-08-08"
+        }
+    ]
+}

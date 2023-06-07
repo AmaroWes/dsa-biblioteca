@@ -2,5 +2,6 @@
     "clientes": [],
     "autores": [],
     "livros": [],
-    "locados": []
+    "locados": [],
+    "adm": {"nome": "admin", "senha": 1234}
 }

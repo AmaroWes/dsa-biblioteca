@@ -62,3 +62,5 @@ buscadores:
         }
     ]
 }
+
+Verificar problemas no login, relativo ao escopo da variável token

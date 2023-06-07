@@ -1,35 +1,19 @@
-const express = require('express')
-const app = express()
-const PORT = 3000
+const express = require('express');
 
+const livrosRouter = require('./router/livros_router');
+const autoresRouter = require('./router/autores_router');
+const clientesRouter = require('./router/clientes_router');
+const loginRouter = require('./router/login_router');
 
-app.get('/', (req, res) => {
-    res.send("Hello world");
-})
+const app = express();
+const PORT = 3000;
 
-app.get('/biblioteca', (req, res) => {
-    res.send("Listagem de livros");
-})
-
-app.get('/biblioteca/:id', (req, res) => {
-    const id = req.params.id;
-    res.send(`Buscar pelo id: ${id}`);
-})
-
-app.post('/biblioteca', (req, res) => {
-    res.send('Cadastramento completo');
-})
-
-app.put('/biblioteca/:id', (req, res) => {
-    const id = req.params.id;
-    res.send(`Atualizando o produto com o id: ${id}`);
-})
-
-app.delete('/biblioteca/:id', (req, res) => {
-    const id = req.params.id;
-    res.send(`Deletando o produto com o id: ${id}`);
-})
+app.use(express.json());
+app.use('/login', loginRouter);
+app.user('/cliente', clientesRouter);
+app.use('/autor', autoresRouter);
+app.use('/livro', livrosRouter);
 
 app.listen(PORT, () => {
-    console.log('Servidor iniciado com sucesso...');
+    console.log("Server init");
 })

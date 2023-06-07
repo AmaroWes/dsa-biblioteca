@@ -64,3 +64,4 @@ buscadores:
 }
 
 Verificar problemas no login, relativo ao escopo da variável token
+necessário que o autor esteja cadastrado

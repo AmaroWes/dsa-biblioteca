@@ -58,7 +58,9 @@ buscadores:
         {
             "id": 0,
             "livro": 0,
-            "data_locado": "2020-08-08"
+            "data_locado": "2020-08-08",
+            "data_prevista": "2020-10-08",
+            "cliente": 0
         }
     ]
 }

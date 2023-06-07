@@ -13,8 +13,7 @@ function validarIdAutor(id) {
 function inserir(livro){
     if (livro && livro.nome && livro.autor && livro.isbn && livro.editora && livro.ano) {
         if (livro.ano.dia && livro.ano.mes && livro.ano.ano) {
-            let livroData = Date.parse(livro.ano.ano + "-" + livro.ano.dia + "-" + livro.ano.mes);
-            let novaData = new DataTransfer(livroData);
+            let novaData = new Date(livro.ano.ano+"-"+livro.ano.dia+"-"+livro.ano.mes);
             if (!isNaN(novaData)) {
                 if (validarIdAutor()) {
                     let id = cmn.gerarId();

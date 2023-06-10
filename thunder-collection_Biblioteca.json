@@ -1,0 +1,403 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "Biblioteca",
+    "dateExported": "2023-06-10T05:06:55.891Z",
+    "version": "1.1",
+    "folders": [
+        {
+            "_id": "0cb1df71-a292-4e67-858e-519644784dc3",
+            "name": "Livros",
+            "containerId": "",
+            "created": "2023-06-09T01:45:34.842Z",
+            "sortNum": 10000
+        },
+        {
+            "_id": "58eceaf1-48a3-4b27-99f0-8758c668c281",
+            "name": "Autor",
+            "containerId": "",
+            "created": "2023-06-09T01:45:42.691Z",
+            "sortNum": 20000
+        },
+        {
+            "_id": "66fc6c76-3837-40b0-88d1-b1086b6a148c",
+            "name": "Cliente",
+            "containerId": "",
+            "created": "2023-06-09T01:45:49.794Z",
+            "sortNum": 30000
+        },
+        {
+            "_id": "5d872928-9547-4c6b-a7ce-9854208466d9",
+            "name": "Locacao",
+            "containerId": "",
+            "created": "2023-06-09T01:45:58.858Z",
+            "sortNum": 40000
+        },
+        {
+            "_id": "561da3e4-b836-43c3-a55f-4aed040ff80d",
+            "name": "Autenticacao",
+            "containerId": "",
+            "created": "2023-06-09T01:46:47.346Z",
+            "sortNum": 50000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "43f093d3-2a06-42df-806a-797441784e76",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "0cb1df71-a292-4e67-858e-519644784dc3",
+            "name": "Adicionar Livro",
+            "url": "localhost:3000/livro",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2023-06-09T01:43:09.635Z",
+            "modified": "2023-06-10T04:09:26.737Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nome\": \"Livro 1\",\n  \"isbn\": 1,\n  \"ano\": \"2020-08-08\",\n  \"editora\": \"editora\",\n  \"autor\": 1\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "9ee14d26-8850-44a9-8130-fd0a4f12c525",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "58eceaf1-48a3-4b27-99f0-8758c668c281",
+            "name": "Adicionar Autor",
+            "url": "localhost:3000/autor",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2023-06-09T01:43:34.754Z",
+            "modified": "2023-06-10T04:26:31.209Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nome\": \"Autor 1\", \n  \"pais\": \"Brasil\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "a1e9f205-19e6-4df7-9f85-607a791c1261",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "66fc6c76-3837-40b0-88d1-b1086b6a148c",
+            "name": "Adicionar Cliente",
+            "url": "localhost:3000/cliente",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2023-06-09T01:43:49.210Z",
+            "modified": "2023-06-10T04:50:22.162Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nome\": \"Cliente 1\",\n  \"matricula\": \"000\",\n  \"telefone\": \"000-0000\",\n  \"login\": \"login\",\n  \"senha\": \"senha\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "8d83e90a-df7b-481f-9ef3-3eb2ed318320",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "5d872928-9547-4c6b-a7ce-9854208466d9",
+            "name": "Adicionar Locacao",
+            "url": "localhost:3000/locacao",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2023-06-09T01:44:05.643Z",
+            "modified": "2023-06-10T04:59:08.621Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"livro\": 1,\n  \"cliente\": 1,\n  \"locado\": \"2020-08-08\",\n  \"previsto\": \"2020-10-08\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "8bfc48f0-a695-4592-a46f-4862e5600985",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "561da3e4-b836-43c3-a55f-4aed040ff80d",
+            "name": "Login",
+            "url": "localhost:3000/login",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2023-06-09T01:47:54.495Z",
+            "modified": "2023-06-10T05:05:36.263Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nome\": \"admin\",\n  \"senha\": 1234\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "391d42be-7e6e-4ce8-b57a-7047d4964e0b",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "0cb1df71-a292-4e67-858e-519644784dc3",
+            "name": "Autalizar Livro",
+            "url": "localhost:3000/livro/1",
+            "method": "PUT",
+            "sortNum": 20000,
+            "created": "2023-06-09T01:47:48.258Z",
+            "modified": "2023-06-10T04:19:58.125Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"id\": 1,\n  \"nome\": \"Livro Atualizado\",\n  \"isbn\": 1,\n  \"ano\": \"2020-08-08\",\n  \"editora\": \"editora\",\n  \"autor\": 1\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "2d309680-9d24-4a05-ace9-537dca7ab031",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "66fc6c76-3837-40b0-88d1-b1086b6a148c",
+            "name": "Atualizar Cliente",
+            "url": "localhost:3000/cliente/1",
+            "method": "PUT",
+            "sortNum": 20000,
+            "created": "2023-06-09T01:47:51.393Z",
+            "modified": "2023-06-10T04:51:21.711Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nome\": \"Cliente Atualizado\",\n  \"matricula\": \"000\",\n  \"telefone\": \"000-0000\",\n  \"login\": \"login\",\n  \"senha\": \"senha\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "1c8f3fea-ef56-4ff4-9aed-2e38e68427d8",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "58eceaf1-48a3-4b27-99f0-8758c668c281",
+            "name": "Autalizar Autor",
+            "url": "localhost:3000/autor/1",
+            "method": "PUT",
+            "sortNum": 20000,
+            "created": "2023-06-09T01:47:52.750Z",
+            "modified": "2023-06-10T04:27:24.385Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nome\": \"Autor atualizado\",\n  \"pais\": \"Brazil\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "c2091f05-6213-40af-a3aa-2b3c710625f8",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "5d872928-9547-4c6b-a7ce-9854208466d9",
+            "name": "Listar Locacao",
+            "url": "localhost:3000/locacao",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2023-06-09T01:52:28.144Z",
+            "modified": "2023-06-10T04:59:34.704Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "4daa938e-77c1-4083-8ecb-78b34645fbdd",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "0cb1df71-a292-4e67-858e-519644784dc3",
+            "name": "Listar Livro",
+            "url": "localhost:3000/livro",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2023-06-09T01:52:14.866Z",
+            "modified": "2023-06-10T04:12:28.508Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "74e6a654-8ac8-41a9-abc6-f1ffeb313524",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "58eceaf1-48a3-4b27-99f0-8758c668c281",
+            "name": "Listar Autor",
+            "url": "localhost:3000/autor",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2023-06-09T01:52:19.647Z",
+            "modified": "2023-06-10T04:27:40.008Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "d502dc4a-0435-4ecb-83fb-85982bbd1d83",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "66fc6c76-3837-40b0-88d1-b1086b6a148c",
+            "name": "Listar Cliente",
+            "url": "localhost:3000/cliente",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2023-06-09T01:52:21.095Z",
+            "modified": "2023-06-10T04:51:41.289Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "6cfb0399-6600-4de8-8ba7-c41cf326d2cc",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "5d872928-9547-4c6b-a7ce-9854208466d9",
+            "name": "Listar Locacao Por Id",
+            "url": "localhost:3000/locacao?id=1",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2023-06-09T01:54:00.160Z",
+            "modified": "2023-06-10T05:00:01.968Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "4b1efefa-e288-4c7b-9ef2-b6b43fd8267c",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "0cb1df71-a292-4e67-858e-519644784dc3",
+            "name": "Listar Livro Por Id",
+            "url": "localhost:3000/livro?id=1",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2023-06-09T01:53:19.439Z",
+            "modified": "2023-06-10T04:43:59.929Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "ca0a29df-348b-4272-8441-80bbf165f0d3",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "58eceaf1-48a3-4b27-99f0-8758c668c281",
+            "name": "Listar Autor Por Id",
+            "url": "localhost:3000/autor/?id=1",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2023-06-09T01:53:40.992Z",
+            "modified": "2023-06-10T04:42:44.971Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "a68a0e2f-aa66-4559-9aa2-3a7273ba97c3",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "66fc6c76-3837-40b0-88d1-b1086b6a148c",
+            "name": "Listar Cliente Por Id",
+            "url": "localhost:3000/cliente?id=1",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2023-06-09T01:53:51.103Z",
+            "modified": "2023-06-10T04:51:56.216Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "67875e9d-bbf4-4bd4-9e89-695b9a4341de",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "5d872928-9547-4c6b-a7ce-9854208466d9",
+            "name": "Remover Locacao",
+            "url": "localhost:3000/locacao/1",
+            "method": "DELETE",
+            "sortNum": 40000,
+            "created": "2023-06-09T01:55:10.143Z",
+            "modified": "2023-06-10T05:00:27.009Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "1",
+                    "isDisabled": true,
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "c767e704-d1d2-4ab3-9135-41cef267e8ab",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "0cb1df71-a292-4e67-858e-519644784dc3",
+            "name": "Remover Livro",
+            "url": "localhost:3000/livro/1",
+            "method": "DELETE",
+            "sortNum": 50000,
+            "created": "2023-06-09T01:54:52.215Z",
+            "modified": "2023-06-10T04:45:33.803Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "1",
+                    "isDisabled": true,
+                    "isPath": false
+                }
+            ],
+            "tests": []
+        },
+        {
+            "_id": "8023d4b6-f0b2-41b5-b3a8-606abf9cc5a6",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "58eceaf1-48a3-4b27-99f0-8758c668c281",
+            "name": "Remover Autor",
+            "url": "localhost:3000/autor/1",
+            "method": "DELETE",
+            "sortNum": 50000,
+            "created": "2023-06-09T01:55:07.041Z",
+            "modified": "2023-06-10T04:36:29.524Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "bb8e2e49-d006-4592-acb0-e5129f5b7b6c",
+            "colId": "980c5b6f-33ba-40c3-9cf3-7c7d47a00984",
+            "containerId": "66fc6c76-3837-40b0-88d1-b1086b6a148c",
+            "name": "Remover Cliente",
+            "url": "localhost:3000/cliente/1",
+            "method": "DELETE",
+            "sortNum": 50000,
+            "created": "2023-06-09T01:55:08.864Z",
+            "modified": "2023-06-10T04:52:05.067Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        }
+    ]
+}

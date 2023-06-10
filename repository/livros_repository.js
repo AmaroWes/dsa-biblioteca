@@ -23,8 +23,8 @@ function inserir(livro){
                     return dt.livros
                 } else {
                     throw ({
-                        numero: 400,
-                        msg: "Erro: Os parametros do livro estao invalidos."
+                        numero: 405,
+                        msg: "Erro: Autor não cadastrado."
                     });
                 }
             } else {

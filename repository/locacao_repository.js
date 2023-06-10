@@ -32,7 +32,7 @@ function devolver(locado){
                     for (let m = 0; m < dt.clientes.length; m++) {
                         if (dt.clientes[m].id == locado.id && dt.clientes[m].livros) {
                             let dataEntrega = Date.now();
-                            let dataPrevista = Date.parse(dt.locado[i].previsao);
+                            let dataPrevista = Date.parse(dt.locados[i].previsto);
                             
                             for (let n = 0; 0 < dt.clientes[m].livros.length; n++) {
                                 if (dt.clientes[m].livros[n].id == locado.id) {
@@ -46,7 +46,7 @@ function devolver(locado){
                             } else {
                                 locado.atraso = false;
                             }
-                            return locado;
+                            return dt.locados;
                         }
                     }
                     throw({
@@ -68,24 +68,24 @@ function devolver(locado){
 }
 
 function alugar(locado){
-    if (locado && locado.cliente && locado.livor && locado.dataLocacao && locado.previsao) {
+    if (locado && locado.cliente && locado.livro && locado.locado && locado.previsto) {
         for (let i=0; i < dt.livros.length; i++) {
             if (dt.livros[i].id == locado.livro && dt.livros[i].status == true) {
-                for (let j = 0; j < dt.clientes; j++) {
+                for (let j = 0; j < dt.clientes.length; j++) {
                     if (dt.clientes[j].id == locado.cliente){
-                        if (!dt.cliente[j].livros) {
-                            let data1 = new Date(locado.dataLocacao);
-                            let data2 = new Date(locado.previsao);
-                            let d1 = Date.parse(locado.dataLocacao);
-                            let d2 = Date.parse(locado.previsao);
+                        if (!dt.clientes[j].livros) {
+                            let data1 = new Date(locado.locado);
+                            let data2 = new Date(locado.previsto);
+                            let d1 = Date.parse(locado.locado);
+                            let d2 = Date.parse(locado.previsto);
                             if (!isNaN(data1) && !isNaN(data2) &&  d1 >= d2) {
                                 let id = cmn.gerarId(dt.locados);
                                 locado.id = id;
                                 dt.clientes[j].livros = {
                                     "id": dt.livro[i].id,
                                     "Nome": dt.livro[i].nome,
-                                    "Emprestado": locado.dataLocacao,
-                                    "Devolver": locado.previsao
+                                    "Emprestado": locado.locado,
+                                    "Devolver": locado.previsto
                                 }
                                 dt.livros[i].status = false;
                                 dt.locados.push(locado);
@@ -97,28 +97,28 @@ function alugar(locado){
                                 })
                             }
                         } else {
-                            if (dt.cliente[j].livros.length >= 3) {
+                            if (dt.clientes[j].livros.length >= 3) {
                                 throw ({
                                     numero: 405,
                                     msg: "Erro: Cliente excedeu o limite de livros."
                                 })
                             }
-                            let data1 = new Date(locado.dataLocacao);
-                            let data2 = new Date(locado.previsao);
-                            let d1 = Date.parse(locado.dataLocacao);
-                            let d2 = Date.parse(locado.previsao);
-                            if (!isNaN(data1) && !isNaN(data2) &&  d1 >= d2) {
+                            let data1 = new Date(locado.locado);
+                            let data2 = new Date(locado.previsto);
+                            let d1 = Date.parse(locado.locado);
+                            let d2 = Date.parse(locado.previsto);
+                            if (!isNaN(data1) && !isNaN(data2) &&  d1 < d2) {
                                 let id = cmn.gerarId(dt.locados);
                                 locado.id = id;
                                 dt.clientes[j].livros.push({
-                                    "id": dt.livro[i].id,
-                                    "Nome": dt.livro[i].nome,
-                                    "Emprestado": locado.dataLocacao,
-                                    "Devolver": locado.previsao
+                                    "id": dt.livros[i].id,
+                                    "Nome": dt.livros[i].nome,
+                                    "Emprestado": locado.locado,
+                                    "Devolver": locado.previsto
                                 });
                                 dt.livros[i].status = false;
                                 dt.locados.push(locado);
-                                return locado;
+                                return dt.locados;
                             } else {
                                 throw ({
                                     numero: 405,

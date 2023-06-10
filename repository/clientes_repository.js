@@ -3,9 +3,11 @@ const cmn = require('./communs_repository');
 
 function inserir(cliente) {
     if (cliente && cliente.nome && cliente.telefone && cliente.login && cliente.senha) {
-        let id = cmn.gerarId();
+        let id = cmn.gerarId(dt.clientes);
         cliente.id = id;
+        cliente.livros = [];
         dt.clientes.push(cliente);
+        return dt.clientes;
     }
     throw ({
         numero: 400,
@@ -38,11 +40,13 @@ function atualizar(id, cliente) {
     }
 
     for (let i = 0; i < dt.clientes.length; i++) {
-        if (dt.clientes[i] == id) {
+        if (dt.clientes[i].id == id) {
             dt.clientes[i].nome = cliente.nome;
             dt.clientes[i].telefone = cliente.telefone;
             dt.clientes[i].login = cliente.login;
             dt.clientes[i].senha = cliente.senha;
+            dt.clientes[i].matricula = cliente.matricula;
+            return dt.clientes;
         }
     }
     throw ({
@@ -63,8 +67,8 @@ function deletar(id) {
 
     for (let i = 0; i < dt.clientes.length; i++) {
         if (dt.clientes[i].id == id){
-            let cliente = dt.clientes.splice(i, 1);
-            return cliente;
+            dt.clientes.splice(i, 1);
+            return dt.clientes;
         }
     }
     throw ({

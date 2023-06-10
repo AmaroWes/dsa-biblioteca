@@ -1,6 +1,8 @@
+const dt = require('../dataset.json');
+
 function gerarId(arr) {
     let id = 1;
-    if (!arr[0]["id"]) {
+    if (arr[0] == undefined) {
         return id;
     }
     for (const i of arr) {
@@ -12,4 +14,11 @@ function gerarId(arr) {
     return id;
 }
 
-module.exports = {gerarId}
+function limpar(indice) {
+    dt.indice = {}
+}
+
+module.exports = {
+    gerarId,
+    limpar
+}

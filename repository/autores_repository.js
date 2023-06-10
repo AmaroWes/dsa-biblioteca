@@ -3,9 +3,10 @@ const cmn = require('./communs_repository');
 
 function inserir(autor) {
     if (autor && autor.nome && autor.pais) {
-        let id = cmn.gerarId();
+        let id = cmn.gerarId(dt.autores);
         autor.id = id;
-        dt.autores.push({autor});
+        dt.autores.push(autor);
+        return dt.autores;
     } else {
         throw ({
             numero: 400,
@@ -19,7 +20,7 @@ function listar() {
 }
 
 function listarPorId(id) {
-    for (let i in dt.autores) {
+    for (let i of dt.autores) {
         if (i.id == id) {
             return i;
         }
@@ -42,6 +43,7 @@ function atualizar(id, autor) {
         if (dt.autores[i].id == id) {
             dt.autores[i].nome = autor.nome;
             dt.autores[i].pais = autor.pais;
+            return dt.autores;
         }
     }
 
@@ -63,8 +65,8 @@ function deletar(id) {
 
     for (let i = 0; i < dt.autores.length; i++) {
         if (dt.autores[i].id == id) {
-            let autor = dt.autores.splice(i, 1);
-            return autor;
+            dt.autores.splice(i, 1);
+            return dt.autores;
         }
     }
     throw ({

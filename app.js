@@ -11,7 +11,7 @@ const PORT = 3000;
 
 app.use(express.json());
 app.use('/login', loginRouter);
-app.user('/cliente', clientesRouter);
+app.use('/cliente', clientesRouter);
 app.use('/autor', autoresRouter);
 app.use('/livro', livrosRouter);
 app.use('/locacao', locacaoRouter);

@@ -12,14 +12,15 @@ function validarIdAutor(id) {
 
 function inserir(livro){
     if (livro && livro.nome && livro.autor && livro.isbn && livro.editora && livro.ano) {
-        if (livro.ano.dia && livro.ano.mes && livro.ano.ano) {
-            let novaData = new Date(livro.ano.ano+"-"+livro.ano.dia+"-"+livro.ano.mes);
+        if (livro.ano) {
+            let novaData = new Date(livro.ano);
             if (!isNaN(novaData)) {
                 if (validarIdAutor()) {
-                    let id = cmn.gerarId();
+                    let id = cmn.gerarId(dt.livros);
                     livro.id = id;
                     livro.status = true;
                     dt.livros.push(livro);
+                    return dt.livros
                 } else {
                     throw ({
                         numero: 400,
@@ -70,38 +71,35 @@ function atualizar(id, livro) {
         });
     }
     
-    if (livro.ano.dia && livro.ano.mes && livro.ano.ano) {
-        let livroData = Date.parse(livro.ano.ano + "-" + livro.ano.dia + "-" + livro.ano.mes);
-        let novaData = new Date(livroData);
-        if (!isNaN(novaData)) {
-            if (validarIdAutor()) {
-                for (let i = 0; i < dt.livros.length; i++) {
-                    if (dt.livros[i].id == id) {
-                        dt.livros[i].nome = livro.nome;
-                        dt.livros[i].autor = livro.autor;
-                        dt.livros[i].isbn = livro.isbn;
-                        dt.livros[i].editora = livro.editora;
-                        dt.livros[i].status = livro.status;
-                        dt.livros[i].ano = livro.ano;
-                        return dt.livros[i];
-                    }
+    let novaData = new Date(livro.ano);
+    if (!isNaN(novaData)) {
+        if (validarIdAutor()) {
+            for (let i = 0; i < dt.livros.length; i++) {
+                if (dt.livros[i].id == id) {
+                    dt.livros[i].nome = livro.nome;
+                    dt.livros[i].autor = livro.autor;
+                    dt.livros[i].isbn = livro.isbn;
+                    dt.livros[i].editora = livro.editora;
+                    dt.livros[i].status = livro.status;
+                    dt.livros[i].ano = livro.ano;
+                    return dt.livros;
                 }
-                throw ({
-                    numero: 404,
-                    msg: "Erro: Livro nao encontrado."
-                });
-            } else {
-                throw ({
-                    numero: 400,
-                    msg: "Erro: Os parametros do livro estao invalidos."
-                });
             }
+            throw ({
+                numero: 404,
+                msg: "Erro: Livro nao encontrado."
+            });
         } else {
             throw ({
                 numero: 400,
                 msg: "Erro: Os parametros do livro estao invalidos."
             });
         }
+    } else {
+        throw ({
+            numero: 400,
+            msg: "Erro: Os parametros do livro estao invalidos."
+        });
     }  
 }
 
@@ -130,8 +128,8 @@ function atualizarStatus(id, livro) {
 function deletar(id) {
     for (let i = 0; i < dt.livros.length; i++) {
         if (dt.livros[i].id == id) {
-            let livro = dt.livros.splice(i, 1);
-            return livro;
+            dt.livros.splice(i, 1);
+            return dt.livros;
         }
     }
     throw ({

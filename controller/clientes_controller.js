@@ -8,7 +8,7 @@ function listar (req, res) {
 function listarPorId (req, res) {
     const id = req.params.id;
     try {
-        const cliente = clientesRepository.buscarPorId(id);
+        const cliente = clientesRepository.listarPorId(id);
         res.json(cliente);
     } catch (err) {
         res.status(err.numero).json(err);

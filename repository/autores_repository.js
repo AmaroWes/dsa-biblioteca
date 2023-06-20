@@ -20,7 +20,6 @@ function listar() {
 }
 
 function listarPorId(id) {
-    console.log("here")
     for (let i of dt.autores) {
         if (i.id == id) {
             return i;

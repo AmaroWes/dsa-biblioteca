@@ -1,8 +1,17 @@
-const dt = require('../dataset');
-const cmn = require('./communs_repository');
+const autores = require('./autores_repository')
+const { Client } = require('pg')
+
+const client = new Client({
+    host: 'localhost',
+    port: 5432,
+    user: 'postgres',
+    password: '123456',
+    database: 'biblioteca',
+})
 
 function validarIdAutor(id) {
-    for (let i in dt.autores) {
+    const listaAutores = autores.listar()
+    for (let i in listaAutores) {
         if (i["id"] == id) {
             return true;
         }
@@ -10,17 +19,19 @@ function validarIdAutor(id) {
     return false;
 }
 
-function inserir(livro){
+async function inserir(livro){
     if (livro && livro.nome && livro.autor && livro.isbn && livro.editora && livro.ano) {
         if (livro.ano) {
             let novaData = new Date(livro.ano);
             if (!isNaN(novaData)) {
                 if (validarIdAutor()) {
-                    let id = cmn.gerarId(dt.livros);
-                    livro.id = id;
-                    livro.status = true;
-                    dt.livros.push(livro);
-                    return dt.livros
+                    let text = 'INSERT INTO livros (nome, autor, isbn, editora, ano, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *';
+                    let values = [livro.nome, livro.autor, livro.isbn, livro.editora, livro.ano, true];
+                    await client.connect();
+                    const res = await client.query(text, values);
+                    const listaLivros = res.rows;
+                    await client.end();
+                    return listaLivros;
                 } else {
                     throw ({
                         numero: 405,
@@ -47,12 +58,17 @@ function inserir(livro){
     }
 }
 
-function listar() {
-    return dt.livros;
+async function listar() {
+    await client.connect();
+    const res = await client.query('SELECT * FROM livros');
+    const listaLivros = res.rows;
+    await client.end();
+    return listaLivros;
 }
 
 function listarPorId(id) {
-    for(let i of dt.livros){ 
+    const listaLivros = listar()
+    for(let i of listaLivros){ 
         if(i.id == id){
             return i;
         }
@@ -63,7 +79,7 @@ function listarPorId(id) {
     });
 }
 
-function atualizar(id, livro) {
+async function atualizar(id, livro) {
     if (!livro && !livro.nome && !livro.autor && !livro.isbn && !livro.editora && !livro.ano && !livro.status) {
         throw ({
             numero: 400,
@@ -74,15 +90,16 @@ function atualizar(id, livro) {
     let novaData = new Date(livro.ano);
     if (!isNaN(novaData)) {
         if (validarIdAutor()) {
-            for (let i = 0; i < dt.livros.length; i++) {
-                if (dt.livros[i].id == id) {
-                    dt.livros[i].nome = livro.nome;
-                    dt.livros[i].autor = livro.autor;
-                    dt.livros[i].isbn = livro.isbn;
-                    dt.livros[i].editora = livro.editora;
-                    dt.livros[i].status = livro.status;
-                    dt.livros[i].ano = livro.ano;
-                    return dt.livros;
+            const livros = listar();
+            for (let i = 0; i < livros.length; i++) {
+                if (livros[i].id == id) {
+                    let text = 'UPDATE livros SET nome = $1, autor = $2, isbn = $3 editoa = $4, ano = $5 WHERE livros.id = $6 RETURNING *';
+                    let values = [livro.nome, livro.autor, livro.isbn, livro.editora, livro.ano, id];
+                    await client.connect();
+                    const res = await client.query(text, values);
+                    const listaLivros = res.rows;
+                    await client.end();
+                    return listaLivros;
                 }
             }
             throw ({
@@ -103,13 +120,19 @@ function atualizar(id, livro) {
     }  
 }
 
-function atualizarStatus(id, livro) {
+async function atualizarStatus(id, livro) {
     if (livro && livro.status) {
-        for (let i = 0; i < dt.livros.length; i++) {
-            if (dt.livros[i].id == id) {
+        const livros = listar()
+        for (let i = 0; i < livros.length; i++) {
+            if (livros[i].id == id) {
                 if (livro.status === true || livro.status === false) {
-                    dt.livros[i].status = livro.status;
-                    return dt.livros[i];
+                    let text = 'UPDATE livros SET status = $1 WHERE livros.id = $2';
+                    let values = [livro.status, id];
+                    await client.connect();
+                    const res = await client.query(text, values);
+                    const listaLivros = res.rows;
+                    await client.end();
+                    return listaLivros;
                 }
             }
         }
@@ -125,11 +148,27 @@ function atualizarStatus(id, livro) {
     }
 }
 
-function deletar(id) {
-    for (let i = 0; i < dt.livros.length; i++) {
-        if (dt.livros[i].id == id) {
-            dt.livros.splice(i, 1);
-            return dt.livros;
+async function deletar(id) {
+    const listaLocados = locados.listar();
+    for (let i = 0; listaLocados.length; i++) {
+        if (listaLocados[i].livro == id) {
+            throw ({
+                numero: 405,
+                msg: "Erro: O livro está em uso em uma locação"
+            })
+        }
+    }
+
+    const livros = listar();
+    for (let i = 0; i < livros.length; i++) {
+        if (livros[i].id == id) {
+            let text = "DELETE FROM livros WHERE livros.id = ($1) RETURNING *";
+            let values = [id];
+            await client.connect();
+            const res = await client.query(text, values);
+            const listaLivros = res.rows;
+            await client.end();
+            return listaLivros;
         }
     }
     throw ({

@@ -1,8 +1,19 @@
-const dt = require('../dataset');
-const cmn = require('./communs_repository');
+const { Client } = require('pg')
 
-function listar() {
-    return dt.locados;
+const client = new Client({
+    host: 'localhost',
+    port: 5432,
+    user: 'postgres',
+    password: '123456',
+    database: 'biblioteca',
+})
+
+async function listar() {
+    await client.connect();
+    const res = await client.query('SELECT * FROM locados');
+    const listaLocados = res.rows;
+    await client.end();
+    return listaLocados;
 }
 
 function listarPorId(id) {

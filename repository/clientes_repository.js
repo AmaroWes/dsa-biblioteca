@@ -1,13 +1,24 @@
-const dt = require('../dataset');
-const cmn = require('./communs_repository');
+const locados = require('./locacao_repository')
 
-function inserir(cliente) {
+const { Client } = require('pg')
+
+const client = new Client({
+    host: 'localhost',
+    port: 5432,
+    user: 'postgres',
+    password: '123456',
+    database: 'biblioteca',
+})
+
+async function inserir(cliente) {
     if (cliente && cliente.nome && cliente.telefone && cliente.login && cliente.senha) {
-        let id = cmn.gerarId(dt.clientes);
-        cliente.id = id;
-        cliente.livros = [];
-        dt.clientes.push(cliente);
-        return dt.clientes;
+        let text = 'INSERT INTO clientes (nome, telefone, login, senha) VALUES ($1, $2, $3, $4) RETURNING *';
+        let values = [cliente.nome, cliente.telefone, cliente.login, cliente.senha];
+        await client.connect();
+        const res = await client.query(text, values);
+        const listaClientes = res.rows;
+        await client.end();
+        return listaClientes;
     }
     throw ({
         numero: 400,
@@ -15,12 +26,17 @@ function inserir(cliente) {
     })
 }
 
-function listar(){
-    return dt.clientes;
+async function listar(){
+    await client.connect();
+    const res = await client.query('SELECT * FROM clientes');
+    const listaClientes = res.rows;
+    await client.end();
+    return listaClientes;
 }
 
 function listarPorId(id){
-    for (let i of dt.clientes) {
+    const clientes = listar()
+    for (let i of clientes) {
         if (i["id"] == id) {
             return i;
         }
@@ -31,7 +47,7 @@ function listarPorId(id){
     })
 }
 
-function atualizar(id, cliente) {
+async function atualizar(id, cliente) {
     if (!cliente && !cliente.nome && !cliente.telefone && !cliente.login && !cliente.senha) {
         throw ({
             numero: 400,
@@ -39,14 +55,17 @@ function atualizar(id, cliente) {
         })
     }
 
-    for (let i = 0; i < dt.clientes.length; i++) {
-        if (dt.clientes[i].id == id) {
-            dt.clientes[i].nome = cliente.nome;
-            dt.clientes[i].telefone = cliente.telefone;
-            dt.clientes[i].login = cliente.login;
-            dt.clientes[i].senha = cliente.senha;
-            dt.clientes[i].matricula = cliente.matricula;
-            return dt.clientes;
+    const clientes = listar()
+
+    for (let i = 0; i < clientes.length; i++) {
+        if (clientes[i].id == id) {
+            let text = 'UPDATE clientes SET nome = ($1), telefone = ($2), login = ($3), senha = ($4) WHERE clientes.id = ($5) RETURNING *';
+            let values = [cliente.nome, cliente.telefone, cliente.login, cliente.senha, id];
+            await client.connect();
+            const res = await client.query(text, values);
+            const listaClientes = res.rows;
+            await client.end();
+            return listaClientes;
         }
     }
     throw ({
@@ -55,9 +74,10 @@ function atualizar(id, cliente) {
     })
 }
 
-function deletar(id) {
-    for (let i = 0; dt.locados.length; i++) {
-        if (dt.locados.cliente == id) {
+async function deletar(id) {
+    const listaLocados = locados.listar();
+    for (let i = 0; listaLocados.length; i++) {
+        if (listaLocados[i].cliente == id) {
             throw ({
                 numero: 405,
                 msg: "Erro: O cliente está em uso em uma locação"
@@ -65,10 +85,16 @@ function deletar(id) {
         }
     }
 
-    for (let i = 0; i < dt.clientes.length; i++) {
-        if (dt.clientes[i].id == id){
-            dt.clientes.splice(i, 1);
-            return dt.clientes;
+    const clientes = listar();
+    for (let i = 0; i < clientes.length; i++) {
+        if (clientes[i].id == id){
+            let text = "DELETE FROM clientes WHERE clientes.id = ($1) RETURNING *";
+            let values = [id];
+            await client.connect();
+            const res = await client.query(text, values);
+            const listaClientes = res.rows;
+            await client.end();
+            return listaClientes;
         }
     }
     throw ({

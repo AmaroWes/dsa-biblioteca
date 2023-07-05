@@ -1,34 +1,35 @@
 const locacaoRepository = require('../repository/locacao_repository');
 
-function listar(req, res) {
-    const listaLocacoes = locacaoRepository.listar();
+async function listar(req, res) {
+    const listaLocacoes = await locacaoRepository.listar();
     res.json(listaLocacoes);
 }
 
-function listarPorId(req, res) {
+async function listarPorId(req, res) {
     const id = req.body.id;
     try {
-        const locacao = locacaoRepository.listarPorId(id);
+        const locacao = await locacaoRepository.listarPorId(id);
         res.json(locacao);
     } catch (err) {
         res.status(err.numero).json(err);
     }
 }
 
-function devolver(req, res) {
+async function devolver(req, res) {
+    const id = req.body.id;
     const locacao = req.body;
     try {
-        const devolucao = locacaoRepository.devolver(locacao);
+        const devolucao = await locacaoRepository.devolver(id, locacao);
         res.json(devolucao);
     } catch (err) {
         res.status(err.numero).json(err);
     }
 }
 
-function alugar(req, res) {
+async function alugar(req, res) {
     const locacao = req.body;
     try {
-        const alugado = locacaoRepository.alugar(locacao);
+        const alugado = await locacaoRepository.alugar(locacao);
         res.json(alugado);
     } catch (err) {
         res.status(err.numero).json(err);

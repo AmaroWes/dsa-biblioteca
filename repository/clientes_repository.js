@@ -1,20 +1,13 @@
-const locados = require('./locacao_repository')
-
 const { Client } = require('pg')
+const conector = require('./conector')
+const conection = conector.conection
 
-const conection = {
-    host: 'localhost',
-    port: 5432,
-    user: 'postgres',
-    password: '123456',
-    database: 'biblioteca'
-}
 
 
 async function inserir(cliente) {
     if (cliente && cliente.nome && cliente.telefone && cliente.login && cliente.senha) {
         const client = new Client(conection);
-        let text = 'INSERT INTO clientes (nome, telefone, login, senha) VALUES ($1, $2, $3, $4) RETURNING *';
+        let text = 'INSERT INTO clientes (nome, telefone, email, senha) VALUES ($1, $2, $3, $4) RETURNING *';
         let values = [cliente.nome, cliente.telefone, cliente.login, cliente.senha];
         await client.connect();
         const res = await client.query(text, values);
@@ -54,7 +47,7 @@ async function atualizar(id, cliente) {
         })
     }
 
-    const clientes = listarPorId(id);
+    const clientes = await listarPorId(id);
     if (!clientes) {
         throw ({
             numero: 404,
@@ -63,7 +56,7 @@ async function atualizar(id, cliente) {
     }
 
     const client = new Client(conection);
-    let text = 'UPDATE clientes SET nome = $1, telefone = $2, login = $3, senha = $4 WHERE id_cliente = $5 RETURNING *';
+    let text = 'UPDATE clientes SET nome = $1, telefone = $2, email = $3, senha = $4 WHERE id_cliente = $5 RETURNING *';
     let values = [cliente.nome, cliente.telefone, cliente.login, cliente.senha, id];
     await client.connect();
     const res = await client.query(text, values);
@@ -75,34 +68,29 @@ async function atualizar(id, cliente) {
 
 async function deletar(id) {
 
-    const listaLocados = locados.listar();
-    if (listaLocados) {
-        for (let i = 0; listaLocados.length; i++) {
-            if (listaLocados[i].cliente == id) {
-                throw ({
-                    numero: 405,
-                    msg: "Erro: O cliente está em uso em uma locação"
-                })
-            }
+    try {
+        const clientes = await listarPorId(id);
+        if (!clientes) {
+            throw ({
+                numero: 404,
+                msg: "Erro: Cliente não encontrado."
+            })
         }
-    }
-    
-    const clientes = listarPorId(id);
-    if (!clientes) {
+        
+        const client = new Client(conection);
+        let text = "DELETE FROM clientes WHERE id_cliente = $1 RETURNING *";
+        let values = [id];
+        await client.connect();
+        const res = await client.query(text, values);
+        const listaClientes = res.rows;
+        await client.end();
+        return listaClientes;
+    } catch (error) {
         throw ({
-            numero: 404,
-            msg: "Erro: Cliente não encontrado."
+            numero: 405,
+            msg: "Erro: O cliente está em uso em uma locação"
         })
     }
-    
-    const client = new Client(conection);
-    let text = "DELETE FROM clientes WHERE id_cliente = $1 RETURNING *";
-    let values = [id];
-    await client.connect();
-    const res = await client.query(text, values);
-    const listaClientes = res.rows;
-    await client.end();
-    return listaClientes;
 
 }
 

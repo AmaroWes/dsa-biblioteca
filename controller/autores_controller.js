@@ -1,47 +1,48 @@
 const autoresRepository = require('../repository/autores_repository');
 
-function listar (req, res) {
-    const listaDeAutores = autoresRepository.listar();
+async function listar (req, res) {
+    const listaDeAutores = await autoresRepository.listar();
     res.json(listaDeAutores);
 }
 
-function listarPorId (req, res) {
+async function listarPorId (req, res) {
     const id = req.params.id;
     try {
-        const autor = autoresRepository.listarPorId(id);
+        const autor = await autoresRepository.listarPorId(id);
         res.json(autor);
     } catch (err) {
         res.status(err.numero).json(err);
     }
 }
 
-function inserir (req, res) {
+async function inserir (req, res) {
     const autor = req.body;
     try {
-        const autorInserido = autoresRepository.inserir(autor);
+        const autorInserido = await autoresRepository.inserir(autor);
         res.status(201).json(autorInserido);
     } catch (err) {
         res.status(err.numero).json(err);
     }
 }
 
-function atualizar (req, res) {
+async function atualizar (req, res) {
     const id = req.params.id;
     const autor = req.body;
     try {
-        const autorAtualizado = autoresRepository.atualizar(id, autor);
+        const autorAtualizado = await autoresRepository.atualizar(id, autor);
         res.json(autorAtualizado);
     } catch (err) {
         res.status(err.numero).json(err);
     }
 }
 
-function deletar (req, res) {
+async function deletar (req, res) {
     const id = req.params.id;
     try {
-        const autorDeletado = autoresRepository.deletar(id);
+        const autorDeletado = await autoresRepository.deletar(id);
         res.json(autorDeletado);
     } catch (err) {
+        console.log(err);
         res.status(err.numero).json(err);
     }
 }

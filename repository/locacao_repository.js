@@ -1,14 +1,8 @@
 const { Client } = require('pg')
 const livrosRepository = require('./livros_repository')
 const clienteRepository = require('./clientes_repository')
-
-const conection = {
-    host: 'localhost',
-    port: 5432,
-    user: 'postgres',
-    password: '123456',
-    database: 'biblioteca'
-}
+const conector = require('./conector')
+const conection = conector.conection
 
 async function listar() {
     const client = new Client(conection);
@@ -36,7 +30,7 @@ async function devolver(id, locado){
         })
     }
     
-    const locados = listarPorId(id);
+    const locados = await listarPorId(id);
     if (!locados) {
         throw ({
             numero: 404,
@@ -44,7 +38,7 @@ async function devolver(id, locado){
         })
     }
 
-    const livros = livrosRepository.listarPorId(locado.livro);
+    const livros = await livrosRepository.listarPorId(locado.livro);
     if (!livros) {
         throw ({
             numero: 404,
@@ -52,7 +46,7 @@ async function devolver(id, locado){
         })
     }
 
-    const clientes = clienteRepository.listarPorId(locado.cliente);
+    const clientes = await clienteRepository.listarPorId(locado.cliente);
     if (!clientes) {
         throw({
             numero: 404,
@@ -62,13 +56,13 @@ async function devolver(id, locado){
 
     const client = new Client(conection);
     await client.connect();
-    let text = 'DELETE FROM locados WHERE locados.id = $1 RETURNING *';
+    let text = 'DELETE FROM locados WHERE id_locado = $1 RETURNING *';
     let values = [id];
     const res = await client.query(text, values);
     const listaLocados = res.rows;
     await client.end();
 
-    livrosRepository.atualizarStatus(true);
+    await livrosRepository.atualizarStatus(true);
 
     return listaLocados;
 
@@ -77,7 +71,7 @@ async function devolver(id, locado){
 async function alugar(locado){
     if (locado && locado.cliente && locado.livro && locado.locado && locado.previsto) {
 
-        const livros = livrosRepository.listarPorId(locado.livro);
+        const livros = await livrosRepository.listarPorId(locado.livro);
         if (!livros) {
             throw ({
                 numero: 404,
@@ -92,7 +86,7 @@ async function alugar(locado){
             })
         }
 
-        const clientes = clienteRepository.listarPorId(locado.cliente);
+        const clientes = await clienteRepository.listarPorId(locado.cliente);
         if (!clientes) {
             throw ({
                 numro: 404,
@@ -100,8 +94,9 @@ async function alugar(locado){
             })
         }
 
-        const locados = listar();
-        if (!locados) {
+        //ERRO daqui para baixo...
+        const locados = await listar();
+        if (!locados[0]) {
             const client = new Client(conection);
             let text = "INSERT INTO locados (id_livro, id_cliente, data_prevista, data_entrada) VALUES ($1, $2, $3, $4) RETURNING *";
             let values = [locado.livro, locado.cliente, locado.locado, locado.previsto];

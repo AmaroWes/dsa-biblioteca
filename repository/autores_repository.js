@@ -1,13 +1,8 @@
-const liros = require('./livros_repository')
 const { Client } = require('pg')
 
-const conection = {
-    host: 'localhost',
-    port: 5432,
-    user: 'postgres',
-    password: '123456',
-    database: 'biblioteca'
-}
+const livros = require('./livros_repository')
+const conector = require('./conector')
+const conection = conector.conection
 
 async function inserir(autor) {
     if (autor && autor.nome && autor.pais) {
@@ -54,7 +49,7 @@ async function atualizar(id, autor) {
         })
     }
 
-    const listaAutores = listarPorId(id);
+    const listaAutores = await listarPorId(id);
     
     if (!listaAutores) {
         throw ({
@@ -75,34 +70,30 @@ async function atualizar(id, autor) {
 }
 
 async function deletar(id) {
-    const listaLivros = livros.listar()
-    if (listaLivros) {
-        for (let i = 0; i < listaLivros.length; i++) {
-            if (listaLivros.autor == id) {
-                throw ({
-                    numero: 405,
-                    msg: "Erro: autor está vinculado a um livro"
-                })
-            }
-        }
-    }
 
-    const listaAutores = listarPorId(id);
-    if (!listaAutores) {
-        throw ({
-            numero: 404,
-            msg: "Erro: Autor não encontrado."
-        })
+    try {
+        const listaAutores = await listarPorId(id);
+
+        if (!listaAutores) {
+            throw ({
+                numero: 404,
+                msg: "Erro: Autor não encontrado."
+            })
+        }
+        
+        const client = new Client(conection);
+        let text = "DELETE FROM autores WHERE id_autor = $1";
+        let values = [id];
+        await client.connect();
+        await client.query(text, values);
+        await client.end();
+        
+        return { numero: 200, msg: "Deletado."};
+
+    } catch (err) {
+        throw (err)
     }
     
-    const client = new Client(conection);
-    let text = "DELETE FROM autores WHERE id_autor = $1 RETURNING *";
-    let values = [id];
-    await client.connect();
-    const res = await client.query(text, values);
-    const autores = res.rows;
-    await client.end();
-    return autores;
     
 }
 

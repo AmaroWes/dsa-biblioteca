@@ -1,14 +1,17 @@
 const { Client } = require('pg')
+const livrosRepository = require('./livros_repository')
+const clienteRepository = require('./clientes_repository')
 
-const client = new Client({
+const conection = {
     host: 'localhost',
     port: 5432,
     user: 'postgres',
     password: '123456',
-    database: 'biblioteca',
-})
+    database: 'biblioteca'
+}
 
 async function listar() {
+    const client = new Client(conection);
     await client.connect();
     const res = await client.query('SELECT * FROM locados');
     const listaLocados = res.rows;
@@ -16,19 +19,16 @@ async function listar() {
     return listaLocados;
 }
 
-function listarPorId(id) {
-    for (const i of dt.locados) {
-        if (i.id == id) {
-            return i;
-        } 
-    }
-    throw ({
-        numero: 404,
-        msg: "Erro: registro não encontrado."
-    })
+async function listarPorId(id) {
+    const client = new Client(conection);
+    await client.connect();
+    const res = await client.query('SELECT * FROM locados WHERE $1', [id]);
+    const listaLocados = res.rows[0];
+    await client.end();
+    return listaLocados;
 }
 
-function devolver(locado){
+async function devolver(id, locado){
     if (!locado && !locado.id && !locado.livro && !locado.cliente) {
         throw ({
             numero: 400,
@@ -36,120 +36,109 @@ function devolver(locado){
         })
     }
     
-    for (let i = 0; i < dt.locados.length; i++) {
-        if (dt.locados[i].id == locado.id) {
-            for (let j = 0; j < dt.livros.length; j++) {
-                if (dt.livros[j].id == locado.livro) {
-                    for (let m = 0; m < dt.clientes.length; m++) {
-                        if (dt.clientes[m].id == locado.id && dt.clientes[m].livros) {
-                            let dataEntrega = Date.now();
-                            let dataPrevista = Date.parse(dt.locados[i].previsto);
-                            
-                            for (let n = 0; 0 < dt.clientes[m].livros.length; n++) {
-                                if (dt.clientes[m].livros[n].id == locado.id) {
-                                    dt.clientes[m].livros.splice(n, 1);
-                                }
-                            }
-                            dt.livros[j].status = true;
-                            dt.locados.splice(i, 1);
-                            if (dataEntrega > dataPrevista) {
-                                locado.atraso = true;
-                            } else {
-                                locado.atraso = false;
-                            }
-                            return dt.locados;
-                        }
-                    }
-                    throw({
-                        numero: 404,
-                        msg: "Erro: Cliente inválido."
+    const locados = listarPorId(id);
+    if (!locados) {
+        throw ({
+            numero: 404,
+            msg: "Erro: Registro para devolução não encontrado."
+        })
+    }
+
+    const livros = livrosRepository.listarPorId(locado.livro);
+    if (!livros) {
+        throw ({
+            numero: 404,
+            msg: "Erro: Livro inválido."
+        })
+    }
+
+    const clientes = clienteRepository.listarPorId(locado.cliente);
+    if (!clientes) {
+        throw({
+            numero: 404,
+            msg: "Erro: Cliente inválido."
+        })
+    }
+
+    const client = new Client(conection);
+    await client.connect();
+    let text = 'DELETE FROM locados WHERE locados.id = $1 RETURNING *';
+    let values = [id];
+    const res = await client.query(text, values);
+    const listaLocados = res.rows;
+    await client.end();
+
+    livrosRepository.atualizarStatus(true);
+
+    return listaLocados;
+
+}
+
+async function alugar(locado){
+    if (locado && locado.cliente && locado.livro && locado.locado && locado.previsto) {
+
+        const livros = livrosRepository.listarPorId(locado.livro);
+        if (!livros) {
+            throw ({
+                numero: 404,
+                msg: "Erro: Livro indisponível."
+            })
+        }
+
+        if (livros.status == false) {
+            throw ({
+                numero: 404,
+                msg: "Erro livro indisponível."
+            })
+        }
+
+        const clientes = clienteRepository.listarPorId(locado.cliente);
+        if (!clientes) {
+            throw ({
+                numro: 404,
+                msg: "Erro: Cliente indisponível."
+            })
+        }
+
+        const locados = listar();
+        if (!locados) {
+            const client = new Client(conection);
+            let text = "INSERT INTO locados (id_livro, id_cliente, data_prevista, data_entrada) VALUES ($1, $2, $3, $4) RETURNING *";
+            let values = [locado.livro, locado.cliente, locado.locado, locado.previsto];
+            await client.connect();
+            const res = await client.query(text, values);
+            const listaLocados = res.rows;
+            await client.end();
+            return listaLocados;
+
+        } else {
+
+            const client = new Client(conection);
+            let text = "SELECT id_cliente, count(id_cliente) as qtd FROM locados GROUP BY id_cliente";
+            await client.connect();
+            const res = await client.query(text);
+            const listaClientes = res.rows;
+            await client.end();
+
+            for (let i in listaClientes) {
+                if (i.id == locado.cliente && i.qtd >= 3) {
+                    throw ({
+                        numero: 405,
+                        msg: "Erro: Cliente excedeu o limite de livros."
                     })
                 }
             }
-            throw ({
-                numero: 404,
-                msg: "Erro: Livro inválido."
-            })
         }
-    }
-    throw ({
-        numero: 404,
-        msg: "Erro: Registro para devolução não encontrado."
-    })
-}
 
-function alugar(locado){
-    if (locado && locado.cliente && locado.livro && locado.locado && locado.previsto) {
-        for (let i=0; i < dt.livros.length; i++) {
-            if (dt.livros[i].id == locado.livro && dt.livros[i].status == true) {
-                for (let j = 0; j < dt.clientes.length; j++) {
-                    if (dt.clientes[j].id == locado.cliente){
-                        if (!dt.clientes[j].livros) {
-                            let data1 = new Date(locado.locado);
-                            let data2 = new Date(locado.previsto);
-                            let d1 = Date.parse(locado.locado);
-                            let d2 = Date.parse(locado.previsto);
-                            if (!isNaN(data1) && !isNaN(data2) &&  d1 >= d2) {
-                                let id = cmn.gerarId(dt.locados);
-                                locado.id = id;
-                                dt.clientes[j].livros = {
-                                    "id": dt.livro[i].id,
-                                    "Nome": dt.livro[i].nome,
-                                    "Emprestado": locado.locado,
-                                    "Devolver": locado.previsto
-                                }
-                                dt.livros[i].status = false;
-                                dt.locados.push(locado);
-                                return locado;
-                            } else {
-                                throw ({
-                                    numero: 405,
-                                    msg: "Erro: Data inválida."
-                                })
-                            }
-                        } else {
-                            if (dt.clientes[j].livros.length >= 3) {
-                                throw ({
-                                    numero: 405,
-                                    msg: "Erro: Cliente excedeu o limite de livros."
-                                })
-                            }
-                            let data1 = new Date(locado.locado);
-                            let data2 = new Date(locado.previsto);
-                            let d1 = Date.parse(locado.locado);
-                            let d2 = Date.parse(locado.previsto);
-                            if (!isNaN(data1) && !isNaN(data2) &&  d1 < d2) {
-                                let id = cmn.gerarId(dt.locados);
-                                locado.id = id;
-                                dt.clientes[j].livros.push({
-                                    "id": dt.livros[i].id,
-                                    "Nome": dt.livros[i].nome,
-                                    "Emprestado": locado.locado,
-                                    "Devolver": locado.previsto
-                                });
-                                dt.livros[i].status = false;
-                                dt.locados.push(locado);
-                                return dt.locados;
-                            } else {
-                                throw ({
-                                    numero: 405,
-                                    msg: "Erro: Data inválida."
-                                })
-                            }
-                        }
-                        
-                    }
-                }
-                throw ({
-                    numro: 404,
-                    msg: "Erro: Cliente indisponível."
-                })
-            }
-        }
-        throw ({
-            numero: 404,
-            msg: "Erro: Livro indisponível."
-        })
+        const client = new Client(conection);
+        let text = "INSERT INTO locados (id_livro, id_cliente, data_prevista, data_entrada) VALUES ($1, $2, $3, $4) RETURNING *";
+        let values = [locado.livro, locado.cliente, locado.locado, locado.previsto];
+        await client.connect();
+        const res = await client.query(text, values);
+        const listaLocados = res.rows;
+        await client.end();
+        return listaLocados;
+
     } else {
         throw({
             numero: 400,

@@ -76,12 +76,14 @@ async function atualizar(id, autor) {
 
 async function deletar(id) {
     const listaLivros = livros.listar()
-    for (let i = 0; i < listaLivros.length; i++) {
-        if (listaLivros.autor == id) {
-            throw ({
-                numero: 405,
-                msg: "Erro: autor está vinculado a um livro"
-            })
+    if (listaLivros) {
+        for (let i = 0; i < listaLivros.length; i++) {
+            if (listaLivros.autor == id) {
+                throw ({
+                    numero: 405,
+                    msg: "Erro: autor está vinculado a um livro"
+                })
+            }
         }
     }
 

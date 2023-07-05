@@ -1,22 +1,20 @@
 const autores = require('./autores_repository')
 const { Client } = require('pg')
 
-const client = new Client({
+const conection = {
     host: 'localhost',
     port: 5432,
     user: 'postgres',
     password: '123456',
-    database: 'biblioteca',
-})
+    database: 'biblioteca'
+}
 
 function validarIdAutor(id) {
-    const listaAutores = autores.listar()
-    for (let i in listaAutores) {
-        if (i["id"] == id) {
-            return true;
-        }
+    const listaAutores = autores.listarPorId(id)
+    if (!listaAutores) {
+        return false;
     }
-    return false;
+    return true;
 }
 
 async function inserir(livro){
@@ -25,6 +23,7 @@ async function inserir(livro){
             let novaData = new Date(livro.ano);
             if (!isNaN(novaData)) {
                 if (validarIdAutor()) {
+                    const client = new Client(conection);
                     let text = 'INSERT INTO livros (nome, autor, isbn, editora, ano, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *';
                     let values = [livro.nome, livro.autor, livro.isbn, livro.editora, livro.ano, true];
                     await client.connect();
@@ -59,6 +58,7 @@ async function inserir(livro){
 }
 
 async function listar() {
+    const client = new Client(conection);
     await client.connect();
     const res = await client.query('SELECT * FROM livros');
     const listaLivros = res.rows;
@@ -66,17 +66,13 @@ async function listar() {
     return listaLivros;
 }
 
-function listarPorId(id) {
-    const listaLivros = listar()
-    for(let i of listaLivros){ 
-        if(i.id == id){
-            return i;
-        }
-    }
-    throw ({
-        numero: 404,
-        msg: "Erro: Livro nao encontrado."
-    });
+async function listarPorId(id) {
+    const client = new Client(conection);
+    await client.connect();
+    const res = await client.query('SELECT * FROM livros WHERE id_livro = $1', [id]);
+    const listaLivros = res.rows[0];
+    await client.end();
+    return listaLivros;
 }
 
 async function atualizar(id, livro) {
@@ -90,22 +86,24 @@ async function atualizar(id, livro) {
     let novaData = new Date(livro.ano);
     if (!isNaN(novaData)) {
         if (validarIdAutor()) {
-            const livros = listar();
-            for (let i = 0; i < livros.length; i++) {
-                if (livros[i].id == id) {
-                    let text = 'UPDATE livros SET nome = $1, autor = $2, isbn = $3 editoa = $4, ano = $5 WHERE livros.id = $6 RETURNING *';
-                    let values = [livro.nome, livro.autor, livro.isbn, livro.editora, livro.ano, id];
-                    await client.connect();
-                    const res = await client.query(text, values);
-                    const listaLivros = res.rows;
-                    await client.end();
-                    return listaLivros;
-                }
+
+            const livros = listarPorId(livro.id);
+            if (!livros) {
+                throw ({
+                    numero: 404,
+                    msg: "Erro: Livro nao encontrado."
+                })
             }
-            throw ({
-                numero: 404,
-                msg: "Erro: Livro nao encontrado."
-            });
+            
+            const client = new Client(conection);
+            let text = 'UPDATE livros SET nome = $1, autor = $2, isbn = $3 editoa = $4, ano = $5 WHERE id_livro = $6 RETURNING *';
+            let values = [livro.nome, livro.autor, livro.isbn, livro.editora, livro.ano, id];
+            await client.connect();
+            const res = await client.query(text, values);
+            const listaLivros = res.rows;
+            await client.end();
+            return listaLivros;
+                
         } else {
             throw ({
                 numero: 400,
@@ -117,29 +115,32 @@ async function atualizar(id, livro) {
             numero: 400,
             msg: "Erro: Os parametros do livro estao invalidos."
         });
-    }  
+    }
+
 }
 
 async function atualizarStatus(id, livro) {
+
     if (livro && livro.status) {
-        const livros = listar()
-        for (let i = 0; i < livros.length; i++) {
-            if (livros[i].id == id) {
-                if (livro.status === true || livro.status === false) {
-                    let text = 'UPDATE livros SET status = $1 WHERE livros.id = $2';
-                    let values = [livro.status, id];
-                    await client.connect();
-                    const res = await client.query(text, values);
-                    const listaLivros = res.rows;
-                    await client.end();
-                    return listaLivros;
-                }
-            }
+        const livros = listarPorId(id);
+        if (!livros) {
+            throw ({
+                numero: 404,
+                msg: "Erro: Livro não encontrado."
+            })
         }
-        throw ({
-            numero: 404,
-            msg: "Erro: Livro não encontrado."
-        })
+
+        if (livro.status === true || livro.status === false) {
+            const client = new Client(conection);
+            let text = 'UPDATE livros SET status = $1 WHERE id_livro = $2';
+            let values = [livro.status, id];
+            await client.connect();
+            const res = await client.query(text, values);
+            const listaLivros = res.rows;
+            await client.end();
+            return listaLivros;
+        }
+
     } else {
         throw ({
             numero: 400,
@@ -159,22 +160,23 @@ async function deletar(id) {
         }
     }
 
-    const livros = listar();
-    for (let i = 0; i < livros.length; i++) {
-        if (livros[i].id == id) {
-            let text = "DELETE FROM livros WHERE livros.id = ($1) RETURNING *";
-            let values = [id];
-            await client.connect();
-            const res = await client.query(text, values);
-            const listaLivros = res.rows;
-            await client.end();
-            return listaLivros;
-        }
+    const livros = listarPorId(id);
+    if (!livros) {
+        throw ({
+            numero: 404,
+            msg: "Erro: Livro não encontrado."
+        })
     }
-    throw ({
-        numero: 404,
-        msg: "Erro: Livro não encontrado."
-    })
+
+    const client = new Client(conection);
+    let text = "DELETE FROM livros WHERE id_livro = $1 RETURNING *";
+    let values = [id];
+    await client.connect();
+    const res = await client.query(text, values);
+    const listaLivros = res.rows;
+    await client.end();
+    return listaLivros;
+
 }
 
 module.exports = {

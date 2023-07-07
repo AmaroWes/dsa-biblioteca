@@ -1,6 +1,6 @@
 const { Client } = require('pg')
-const livrosRepository = require('./livros_repository')
-const clienteRepository = require('./clientes_repository')
+const livrosRepository = require('./livros_repository.js')
+const clienteRepository = require('./clientes_repository.js')
 const conector = require('./conector')
 const conection = conector.conection
 
@@ -16,21 +16,16 @@ async function listar() {
 async function listarPorId(id) {
     const client = new Client(conection);
     await client.connect();
-    const res = await client.query('SELECT * FROM locados WHERE $1', [id]);
+    const res = await client.query('SELECT * FROM locados WHERE id_locado = $1', [id]);
     const listaLocados = res.rows[0];
     await client.end();
     return listaLocados;
 }
 
-async function devolver(id, locado){
-    if (!locado && !locado.id && !locado.livro && !locado.cliente) {
-        throw ({
-            numero: 400,
-            msg: "Erro: Os parametros estão inválidos."
-        })
-    }
+async function devolver(id){
     
     const locados = await listarPorId(id);
+    console.log("here")
     if (!locados) {
         throw ({
             numero: 404,
@@ -38,22 +33,7 @@ async function devolver(id, locado){
         })
     }
 
-    const livros = await livrosRepository.listarPorId(locado.livro);
-    if (!livros) {
-        throw ({
-            numero: 404,
-            msg: "Erro: Livro inválido."
-        })
-    }
-
-    const clientes = await clienteRepository.listarPorId(locado.cliente);
-    if (!clientes) {
-        throw({
-            numero: 404,
-            msg: "Erro: Cliente inválido."
-        })
-    }
-
+    
     const client = new Client(conection);
     await client.connect();
     let text = 'DELETE FROM locados WHERE id_locado = $1 RETURNING *';
@@ -62,7 +42,7 @@ async function devolver(id, locado){
     const listaLocados = res.rows;
     await client.end();
 
-    await livrosRepository.atualizarStatus(true);
+    await livrosRepository.atualizarStatus(listaLocados[0].id_livro, {"status": true});
 
     return listaLocados;
 
@@ -87,15 +67,13 @@ async function alugar(locado){
         }
 
         const clientes = await clienteRepository.listarPorId(locado.cliente);
-        if (!clientes) {
+
+        if (clientes === undefined) {
             throw ({
-                numro: 404,
+                numero: 404,
                 msg: "Erro: Cliente indisponível."
             })
-        }
-
-        //RangeError [ERR_HTTP_INVALID_STATUS_CODE]: Invalid status code: undefined        
-        //https://stackoverflow.com/questions/20355477/using-and-catching-rangeerror-in-javascript
+        } 
 
         if (true === true) {
             const client = new Client(conection);
@@ -106,7 +84,7 @@ async function alugar(locado){
             await client.end();
 
             for (let i in listaClientes) {
-                if (i.id == locado.cliente && i.qtd >= 3) {
+                if (listaClientes[i].id_cliente == locado.cliente && listaClientes[i].qtd >= 3) {
                     throw ({
                         numero: 405,
                         msg: "Erro: Cliente excedeu o limite de livros."
@@ -122,6 +100,9 @@ async function alugar(locado){
         const res = await client.query(text, values);
         const listaLocados = res.rows;
         await client.end();
+
+        await livrosRepository.atualizarStatus(locado.livro, {"status": false});
+
         return listaLocados;
 
     } else {

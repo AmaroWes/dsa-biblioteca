@@ -6,7 +6,7 @@ async function listar(req, res) {
 }
 
 async function listarPorId(req, res) {
-    const id = req.body.id;
+    const id = req.params.id;
     try {
         const locacao = await locacaoRepository.listarPorId(id);
         res.json(locacao);
@@ -16,10 +16,9 @@ async function listarPorId(req, res) {
 }
 
 async function devolver(req, res) {
-    const id = req.body.id;
-    const locacao = req.body;
+    const id = req.params.id;
     try {
-        const devolucao = await locacaoRepository.devolver(id, locacao);
+        const devolucao = await locacaoRepository.devolver(id);
         res.json(devolucao);
     } catch (err) {
         res.status(err.numero).json(err);

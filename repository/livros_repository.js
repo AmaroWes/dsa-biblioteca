@@ -116,8 +116,8 @@ async function atualizar(id, livro) {
 }
 
 async function atualizarStatus(id, livro) {
-
-    if (livro && livro.status) {
+    
+    if (livro && livro.status || livro && livro.status === false) {
         const livros = await listarPorId(id);
         if (!livros) {
             throw ({

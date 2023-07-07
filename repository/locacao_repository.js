@@ -94,20 +94,10 @@ async function alugar(locado){
             })
         }
 
-        //ERRO daqui para baixo...
-        const locados = await listar();
-        if (!locados[0]) {
-            const client = new Client(conection);
-            let text = "INSERT INTO locados (id_livro, id_cliente, data_prevista, data_entrada) VALUES ($1, $2, $3, $4) RETURNING *";
-            let values = [locado.livro, locado.cliente, locado.locado, locado.previsto];
-            await client.connect();
-            const res = await client.query(text, values);
-            const listaLocados = res.rows;
-            await client.end();
-            return listaLocados;
+        //RangeError [ERR_HTTP_INVALID_STATUS_CODE]: Invalid status code: undefined        
+        //https://stackoverflow.com/questions/20355477/using-and-catching-rangeerror-in-javascript
 
-        } else {
-
+        if (true === true) {
             const client = new Client(conection);
             let text = "SELECT id_cliente, count(id_cliente) as qtd FROM locados GROUP BY id_cliente";
             await client.connect();
